@@ -10,12 +10,13 @@ app.use(express.json());
 
 // Initialize Scout SDK client
 const ragClient = new OpenRAGClient({
-  pinecone: {
-    apiKey: process.env.PINECONE_API_KEY!,
-    indexName: 'chatbot-knowledge'
+  scout: {
+    apiKey: process.env.SCOUT_API_KEY!,
+    projectId: process.env.SCOUT_PROJECT_ID!,
+    apiUrl: process.env.SCOUT_API_URL || 'https://scout-mauve-nine.vercel.app'
   },
-  openai: {
-    apiKey: process.env.OPENAI_API_KEY!
+  github: {
+    token: process.env.GITHUB_TOKEN // Optional
   }
 });
 

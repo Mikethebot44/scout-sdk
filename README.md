@@ -5,7 +5,7 @@ A TypeScript SDK for building RAG-enhanced AI applications with vector search an
 ## Features
 
 - **Universal Source Indexing**: Index GitHub repositories and documentation websites
-- **Vector Search**: Semantic search using OpenAI embeddings and Pinecone vector database  
+- **Vector Search**: Semantic search using Scout API for embeddings and vector storage  
 - **Developer-Friendly API**: Clean TypeScript interface with native promises
 - **Batch Operations**: Index multiple sources efficiently
 - **AI Provider Integration**: Format context for OpenAI, Claude, and other LLMs
@@ -25,16 +25,15 @@ import { OpenRAGClient } from 'scout-sdk';
 
 // Initialize the client
 const client = new OpenRAGClient({
-  pinecone: {
-    apiKey: 'your-pinecone-api-key',
-    indexName: 'my-knowledge-base' // optional
+  scout: {
+    apiKey: process.env.SCOUT_API_KEY!,
+    projectId: process.env.SCOUT_PROJECT_ID!,
+    apiUrl: process.env.SCOUT_API_URL || 'https://scout-mauve-nine.vercel.app'
   },
-  openai: {
-    apiKey: 'your-openai-api-key'
-  }
+  github: { token: process.env.GITHUB_TOKEN } // optional
 });
 
-// Initialize (creates Pinecone index if needed)
+// Initialize (health checks Scout API)
 await client.initialize();
 
 // Index a GitHub repository
@@ -66,13 +65,12 @@ new OpenRAGClient(config: OpenRAGConfig)
 
 ```typescript
 interface OpenRAGConfig {
-  pinecone: {
-    apiKey: string;           // Required: Pinecone API key
-    environment?: string;     // Optional: Default 'us-east-1'
-    indexName?: string;       // Optional: Default 'scout-index'
+  scout: {
+    apiKey: string;           // Required: Scout API key
+    projectId: string;        // Required: Scout project ID
+    apiUrl?: string;          // Optional: Default 'https://scout-mauve-nine.vercel.app'
   };
-  openai: {
-    apiKey: string;           // Required: OpenAI API key
+  openai?: {
     model?: string;           // Optional: Default 'text-embedding-3-small'
   };
   github?: {
@@ -91,7 +89,7 @@ interface OpenRAGConfig {
 
 ##### `initialize(): Promise<void>`
 
-Initialize the client and create Pinecone index if needed. Must be called before other operations.
+Initialize the client and health check Scout API. Must be called before other operations.
 
 ##### `indexSource(url: string, options?: IndexOptions): Promise<IndexResult>`
 
@@ -162,8 +160,12 @@ See [`examples/express-chatbot/server.ts`](./examples/express-chatbot/server.ts)
 import { OpenRAGClient } from 'scout-sdk';
 
 const ragClient = new OpenRAGClient({
-  pinecone: { apiKey: process.env.PINECONE_API_KEY! },
-  openai: { apiKey: process.env.OPENAI_API_KEY! }
+  scout: {
+    apiKey: process.env.SCOUT_API_KEY!,
+    projectId: process.env.SCOUT_PROJECT_ID!,
+    apiUrl: process.env.SCOUT_API_URL || 'https://scout-mauve-nine.vercel.app'
+  },
+  github: { token: process.env.GITHUB_TOKEN } // optional
 });
 
 export default async function handler(req, res) {
@@ -187,15 +189,15 @@ export default async function handler(req, res) {
 ## Prerequisites
 
 You need API keys for:
-- **Pinecone**: Vector storage ([Get API key](https://www.pinecone.io/))
-- **OpenAI**: Text embeddings ([Get API key](https://platform.openai.com/api-keys))
+- **Scout API**: Vector storage and embeddings ([Get API key](https://scout-mauve-nine.vercel.app))
 - **GitHub Token** (optional): For higher rate limits ([Create token](https://github.com/settings/tokens))
 
 ## Environment Variables
 
 ```bash
-PINECONE_API_KEY=your_pinecone_key
-OPENAI_API_KEY=your_openai_key
+SCOUT_API_KEY=your_scout_api_key
+SCOUT_PROJECT_ID=your_scout_project_id
+SCOUT_API_URL=https://scout-mauve-nine.vercel.app  # Optional
 GITHUB_TOKEN=your_github_token  # Optional
 ```
 

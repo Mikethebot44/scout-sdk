@@ -17,7 +17,9 @@ export type {
   FormatOptions,
   GitHubOptions,
   DocOptions,
-  SourceType
+  SourceType,
+  IVectorStoreService,
+  IEmbeddingService
 } from './types/index.js';
 
 // Error exports
@@ -38,8 +40,8 @@ export {
 } from './types/index.js';
 
 // Service exports (for advanced use cases)
-export { VectorStoreService } from './services/VectorStoreService.js';
-export { EmbeddingService } from './services/EmbeddingService.js';
+export { ScoutVectorStoreService } from './services/ScoutVectorStoreService.js';
+export { ScoutEmbeddingService } from './services/ScoutEmbeddingService.js';
 export { GitHubService } from './services/GitHubService.js';
 export { WebScrapingService } from './services/WebScrapingService.js';
 export { ContentProcessor } from './services/ContentProcessor.js';

@@ -1,36 +1,21 @@
 // ===== SDK Configuration Types =====
 
 export interface OpenRAGConfig {
-  /** Pinecone configuration */
-  pinecone: {
-    /** Pinecone API key */
+  scout: {
     apiKey: string;
-    /** Pinecone environment (default: us-east-1) */
-    environment?: string;
-    /** Pinecone index name (default: scout-index) */
-    indexName?: string;
+    projectId: string;
+    apiUrl?: string; // default: https://scout-mauve-nine.vercel.app
   };
-  /** OpenAI configuration */
-  openai: {
-    /** OpenAI API key */
-    apiKey: string;
-    /** Embedding model (default: text-embedding-3-small) */
+  openai?: {
     model?: string;
   };
-  /** GitHub configuration (optional) */
   github?: {
-    /** GitHub token for higher rate limits */
     token?: string;
   };
-  /** Processing configuration */
   processing?: {
-    /** Maximum file size in bytes (default: 1MB) */
     maxFileSize?: number;
-    /** Maximum chunk size in characters (default: 8192) */
     maxChunkSize?: number;
-    /** Chunk overlap in characters (default: 200) */
     chunkOverlap?: number;
-    /** Batch size for vector operations (default: 100) */
     batchSize?: number;
   };
 }
@@ -328,12 +313,33 @@ export function detectSourceType(url: string): SourceType {
 }
 
 export function validateConfig(config: OpenRAGConfig): void {
-  if (!config.pinecone?.apiKey) {
-    throw new ConfigurationError('Pinecone API key is required');
+  if (!config.scout?.apiKey || !config.scout?.projectId) {
+    throw new ConfigurationError('Scout configuration is required: scout.apiKey and scout.projectId');
   }
-  if (!config.openai?.apiKey) {
-    throw new ConfigurationError('OpenAI API key is required');
-  }
+}
+
+export interface IVectorStoreService {
+  initialize(): Promise<void>;
+  upsertVectors(vectors: Vector[]): Promise<void>;
+  queryVectors(vector: number[], options?: {
+    topK?: number;
+    filter?: Record<string, any>;
+    threshold?: number;
+    includeMetadata?: boolean;
+  }): Promise<QueryResult[]>;
+  deleteVectors(ids: string[]): Promise<void>;
+  deleteByFilter(filter: Record<string, any>): Promise<void>;
+  getIndexStats(): Promise<{ totalVectors: number; dimension: number; indexFullness: number }>;
+  listSources(): Promise<string[]>;
+  healthCheck(): Promise<boolean>;
+}
+
+export interface IEmbeddingService {
+  generateEmbedding(text: string): Promise<number[]>;
+  generateEmbeddings(texts: string[]): Promise<number[][]>;
+  generateQueryEmbedding(query: string): Promise<number[]>;
+  healthCheck(): Promise<boolean>;
+  getModelInfo(): { model: string; dimensions: number; maxTokens: number };
 }
 
 // ===== GitHub Types =====

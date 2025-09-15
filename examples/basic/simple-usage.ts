@@ -7,20 +7,17 @@ import { OpenRAGClient } from 'scout-sdk';
 async function main() {
   // Initialize the client
   const client = new OpenRAGClient({
-    pinecone: {
-      apiKey: process.env.PINECONE_API_KEY!,
-      indexName: 'my-rag-index' // Optional, defaults to 'scout-index'
-    },
-    openai: {
-      apiKey: process.env.OPENAI_API_KEY!,
-      model: 'text-embedding-3-small' // Optional, this is the default
+    scout: {
+      apiKey: process.env.SCOUT_API_KEY!,
+      projectId: process.env.SCOUT_PROJECT_ID!,
+      apiUrl: process.env.SCOUT_API_URL || 'https://scout-mauve-nine.vercel.app'
     },
     github: {
       token: process.env.GITHUB_TOKEN // Optional, for higher rate limits
     }
   });
 
-  // Initialize (creates Pinecone index if needed)
+  // Initialize (health checks Scout API)
   await client.initialize();
 
   // Index a GitHub repository

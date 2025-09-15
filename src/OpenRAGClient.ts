@@ -20,8 +20,8 @@ import {
   OpenRAGError
 } from './types/index.js';
 
-import { VectorStoreService } from './services/VectorStoreService.js';
-import { EmbeddingService } from './services/EmbeddingService.js';
+import { ScoutVectorStoreService } from './services/ScoutVectorStoreService.js';
+import { ScoutEmbeddingService } from './services/ScoutEmbeddingService.js';
 import { GitHubService } from './services/GitHubService.js';
 import { WebScrapingService } from './services/WebScrapingService.js';
 import { ContentProcessor } from './services/ContentProcessor.js';
@@ -45,8 +45,8 @@ import { ContentProcessor } from './services/ContentProcessor.js';
  */
 export class OpenRAGClient {
   private config: OpenRAGConfig;
-  private vectorStoreService: VectorStoreService;
-  private embeddingService: EmbeddingService;
+  private vectorStoreService: ScoutVectorStoreService;
+  private embeddingService: ScoutEmbeddingService;
   private githubService: GitHubService;
   private webScrapingService: WebScrapingService;
   private contentProcessor: ContentProcessor;
@@ -58,10 +58,9 @@ export class OpenRAGClient {
     // Apply defaults
     this.config = {
       ...config,
-      pinecone: {
-        environment: 'us-east-1',
-        indexName: 'scout-index',
-        ...config.pinecone
+      scout: {
+        apiUrl: 'https://scout-mauve-nine.vercel.app',
+        ...config.scout
       },
       openai: {
         model: 'text-embedding-3-small',
@@ -77,8 +76,8 @@ export class OpenRAGClient {
     };
 
     // Initialize services
-    this.vectorStoreService = new VectorStoreService(this.config);
-    this.embeddingService = new EmbeddingService(this.config);
+    this.vectorStoreService = new ScoutVectorStoreService(this.config);
+    this.embeddingService = new ScoutEmbeddingService(this.config);
     this.githubService = new GitHubService(this.config);
     this.webScrapingService = new WebScrapingService();
     this.contentProcessor = new ContentProcessor(this.config);
@@ -194,7 +193,7 @@ export class OpenRAGClient {
       }));
 
       // Store in vector database
-      console.log('Storing vectors in Pinecone...');
+      console.log('Storing vectors via Scout API...');
       await this.vectorStoreService.upsertVectors(vectors);
 
       const processingTime = Date.now() - startTime;
